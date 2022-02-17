@@ -53,7 +53,7 @@ class Slacker:
 
     ## Begin of Parsers:
 
-    def default_parser(self, message, log_level: int):
+    def default_parser(self, message, log_level):
         # https://api.slack.com/messaging/composing/layouts
         if not isinstance(message, str):
             logger.critical('DataType')
@@ -74,13 +74,7 @@ class Slacker:
                         "text": f"{self.log_level_to_icons[log_level]} *{self.log_levels[log_level//10 - 1 ]}*"
                     }
                 },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "`" + date_string + "`"
-                    }
-                },                
+                           
                 
                 
             ],
@@ -89,6 +83,13 @@ class Slacker:
                     "color": f"{self.log_level_to_colors[log_level]}",
                     "fallback": "Ups, looks like something is not well",
                     "blocks": [
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": "`" + date_string + "`"
+                            }
+                        },     
                         {
                             "type": "section",
                             "text": {
@@ -106,22 +107,25 @@ class Slacker:
         }
         return parsed_msg
 
-    def parse_icinga2_msg(self, message, log_level: int=20):
+    def parse_icinga2_msg(self, message, log_level=20):
         pass
-    def parse_ubuntu_watchdog_msg(self, message, log_level: int=20):
+    def parse_ubuntu_watchdog_msg(self, message, log_level=20):
         pass
     
     
     ## End of parsers 
 
 
-    def send_message(self, message, log_level: str=20, parser=None):
+    def send_message(self, message, log_level=20, parser=None):       
         if isinstance(log_level, str):
             log_level = log_level.upper()
             log_level = self.log_level_to_int(log_level)
         if parser is None:
             message =self.default_parser(message, log_level)
         else:
+            if '__' in parser:
+                raise NameError('Parser name not allowed')
+            parser = getattr(self, parser)
             message = parser(message, log_level)
 
         if self.validate_message(message):
