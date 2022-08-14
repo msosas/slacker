@@ -9,7 +9,7 @@ class WebHookMissingException(Exception):
 
 
 class Config:  # pylint: disable=R0904,W0511
-    def __init__(self, slack_web_hook: str='', slack_username: str='Fingermark Infra Notification', slack_channel: str='test-integrations'):
+    def __init__(self, slack_web_hook: str='', slack_username: str='Notification', slack_channel: str='@matias'):
         if slack_web_hook == '':
             if getenv('SLACK_WEB_HOOK') != None:
                 self.slack_web_hook = getenv('SLACK_WEB_HOOK')
